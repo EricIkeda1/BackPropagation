@@ -28,7 +28,7 @@ Execute o código Python:
     python BackPropagation.py
     ```
 
-Instalação do Numpy
+Instalação do Numpy:
 `pip install NumPy`
 
 O código exibirá a classificação das cores com base nos valores RGB fornecidos.
