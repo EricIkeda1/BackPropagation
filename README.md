@@ -21,7 +21,7 @@ Este projeto implementa uma rede neural simples utilizando o algoritmo de **Back
 
 ## Pré-requisitos
 
-Certifique-se de ter o Python instalado e o pacote `NumPy` para executar o código. Você pode instalá-lo executando o comando abaixo no terminal ou PowerShell:
+Certifique-se de ter o Python instalado. Além disso, instale o pacote `NumPy` e `OpenCV` utilizando o comando abaixo no terminal ou PowerShell:
 
-```bash
-pip install NumPy
+```Powershell
+pip install numpy opencv-python
