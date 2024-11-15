@@ -43,26 +43,50 @@ def train_with_camera():
             print("Erro ao acessar a câmera.")
             break
 
-        height, width, _ = frame.shape
-        center_x, center_y = width // 2, height // 2
-        roi_size = 50
-        roi = frame[center_y - roi_size:center_y + roi_size, center_x - roi_size:center_x + roi_size]
-        avg_color = roi.mean(axis=(0, 1)) / 255.0
-        r, g, b = avg_color
-        X = np.array([[r, g, b]])
+        # Convertendo a imagem para o espaço de cor HSV
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        hidden_layer_input = np.dot(X, weights_input_hidden)
-        hidden_layer_activation = sigmoid(hidden_layer_input)
-        output_layer_input = np.dot(hidden_layer_activation, weights_hidden_output)
-        predicted_output = sigmoid(output_layer_input)
-        confidence = np.max(predicted_output)
+        # Definindo os limites das cores no espaço HSV (ajustados para cada cor)
+        lower_red = np.array([0, 120, 70])
+        upper_red = np.array([10, 255, 255])
+        lower_green = np.array([35, 40, 40])
+        upper_green = np.array([85, 255, 255])
+        lower_blue = np.array([100, 150, 50])  # Ajustado para o azul
+        upper_blue = np.array([140, 255, 255])  # Ajustado para o azul
 
-        if confidence >= 0.7:
-            detected_color = color_description(predicted_output)
+        # Criando máscaras para cada cor
+        mask_red = cv2.inRange(hsv, lower_red, upper_red)
+        mask_green = cv2.inRange(hsv, lower_green, upper_green)
+        mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
+
+        # Verificando a predominância de cada cor
+        red_area = np.sum(mask_red) / (frame.shape[0] * frame.shape[1])
+        green_area = np.sum(mask_green) / (frame.shape[0] * frame.shape[1])
+        blue_area = np.sum(mask_blue) / (frame.shape[0] * frame.shape[1])
+
+        # Determinando qual cor é a predominante
+        if red_area > 0.1:  # Ajuste do limiar de área
+            detected_color = "Vermelho"
+            confidence = red_area
+        elif green_area > 0.1:
+            detected_color = "Verde"
+            confidence = green_area
+        elif blue_area > 0.1:
+            detected_color = "Azul"
+            confidence = blue_area
+        else:
+            detected_color = "Nenhuma cor predominante"
+            confidence = 0
+
+        if confidence >= 0.1:
             print(f"Cor detectada: {detected_color} com confiança {confidence:.2f}")
         else:
-            print("Nenhuma cor detectada.")
+            print("Nenhuma cor detectada com alta confiança.")
 
+        # Exibe a imagem com a máscara
+        cv2.imshow("Máscara", mask_blue)  # Para testar se a máscara azul está funcionando
+
+        # Verifica se a tecla 'q' foi pressionada para sair
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             break
@@ -71,7 +95,7 @@ def train_with_camera():
     cv2.destroyAllWindows()
 
 def train_without_camera():
-    global weights_input_hidden, weights_hidden_output  # Declarar as variáveis como globais
+    global weights_input_hidden, weights_hidden_output
 
     X = np.array([
         [0.9, 0.1, 0.1],  # Vermelho
