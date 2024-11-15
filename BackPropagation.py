@@ -35,6 +35,15 @@ def color_description(output):
 def train_with_camera():
     global weights_input_hidden, weights_hidden_output
     cap = cv2.VideoCapture(0)
+
+    # Verificando se a câmera foi aberta corretamente
+    if not cap.isOpened():
+        print("Erro ao acessar a câmera.")
+        return
+
+    # Carregar o classificador em cascata Haar para detecção de rosto
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+
     print("Aponte para uma cor (Vermelho, Verde ou Azul). Pressione 'q' para sair.")
 
     while True:
@@ -59,13 +68,19 @@ def train_with_camera():
         mask_green = cv2.inRange(hsv, lower_green, upper_green)
         mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
 
+        # Criando uma imagem para mostrar todas as máscaras juntas
+        combined_mask = cv2.merge([mask_red, mask_green, mask_blue])
+
+        # Exibe a imagem combinada das máscaras
+        cv2.imshow("Máscaras Combinadas", combined_mask)
+
         # Verificando a predominância de cada cor
         red_area = np.sum(mask_red) / (frame.shape[0] * frame.shape[1])
         green_area = np.sum(mask_green) / (frame.shape[0] * frame.shape[1])
         blue_area = np.sum(mask_blue) / (frame.shape[0] * frame.shape[1])
 
         # Determinando qual cor é a predominante
-        if red_area > 0.1:  # Ajuste do limiar de área
+        if red_area > 0.1:
             detected_color = "Vermelho"
             confidence = red_area
         elif green_area > 0.1:
@@ -83,8 +98,18 @@ def train_with_camera():
         else:
             print("Nenhuma cor detectada com alta confiança.")
 
-        # Exibe a imagem com a máscara
-        cv2.imshow("Máscara", mask_blue)  # Para testar se a máscara azul está funcionando
+        # Convertendo para escala de cinza (necessário para a detecção de rostos)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # Detectando rostos na imagem
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+        # Desenhando um retângulo ao redor do rosto detectado
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)  # Cor azul para o retângulo
+
+        # Exibe a imagem original da câmera com o retângulo ao redor do rosto
+        cv2.imshow("Imagem com Detecção de Rosto", frame)
 
         # Verifica se a tecla 'q' foi pressionada para sair
         key = cv2.waitKey(1) & 0xFF
