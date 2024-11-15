@@ -159,8 +159,8 @@ def train_without_camera():
 def main():
     while True:
         print("\nEscolha uma opção:")
-        print("1. Com Câmera")
-        print("2. Sem Câmera")
+        print("1. Treinamento com Câmera")
+        print("2. Treinamento sem Câmera")
         print("3. Sair")
         choice = input("Digite sua escolha: ")
 
