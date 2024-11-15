@@ -23,23 +23,5 @@ Este projeto implementa uma rede neural simples utilizando o algoritmo de **Back
 
 Certifique-se de ter o Python instalado e o pacote `NumPy` para executar o código. Você pode instalá-lo executando o comando abaixo no terminal ou PowerShell:
 
-Execute o código Python:
-    ```
-    python BackPropagation.py
-    ```
-
-Instalação do Numpy:
-`pip install NumPy`
-
-O código exibirá a classificação das cores com base nos valores RGB fornecidos.
-
-## Como Funciona
-
-A função `detect_color(r, g, b)` recebe os valores RGB normalizados (entre 0 e 1) como entrada, realiza o cálculo do feedforward através das camadas da rede, e retorna a cor classificada. 
-
-Exemplo de uso:
-
-```python
-print(detect_color(0.9, 0.2, 0.1))  # Esperado: Vermelho
-print(detect_color(0.2, 0.8, 0.2))  # Esperado: Verde
-print(detect_color(0.1, 0.1, 0.9))  # Esperado: Azul
+```bash
+pip install NumPy

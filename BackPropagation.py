@@ -34,14 +34,20 @@ hidden_layer_neurons = 4          # Número de neurônios na camada oculta
 output_neurons = 3                # Número de neurônios na camada de saída (vermelho, verde, azul)
 learning_rate = 0.1               # Taxa de aprendizado
 epochs = 10000                    # Número de épocas de treinamento
+max_error_threshold = 0.01        # Limite de erro médio para parar o treinamento
 
 # Inicializando os pesos aleatoriamente
 np.random.seed(1)
 weights_input_hidden = np.random.uniform(size=(input_layer_neurons, hidden_layer_neurons))
 weights_hidden_output = np.random.uniform(size=(hidden_layer_neurons, output_neurons))
 
+# Função para verificar o erro
+def check_error(error):
+    return np.mean(np.abs(error)) <= max_error_threshold
+
 # Treinamento da rede
-for epoch in range(epochs):
+epoch = 0
+while True:
     # Forward pass
     hidden_layer_input = np.dot(X, weights_input_hidden)
     hidden_layer_activation = sigmoid(hidden_layer_input)
@@ -50,8 +56,15 @@ for epoch in range(epochs):
 
     # Cálculo do erro
     error = y - predicted_output
+
+    # Exibe o erro a cada 1000 épocas
     if epoch % 1000 == 0:
         print(f"Erro na época {epoch}: {np.mean(np.abs(error))}")
+
+    # Verifica se o erro está abaixo do limite
+    if check_error(error):
+        print("Erro abaixo do limite. Processo concluído.")
+        break
 
     # Backpropagation
     d_predicted_output = error * sigmoid_derivative(predicted_output)
@@ -61,6 +74,8 @@ for epoch in range(epochs):
     # Atualização dos pesos
     weights_hidden_output += hidden_layer_activation.T.dot(d_predicted_output) * learning_rate
     weights_input_hidden += X.T.dot(d_hidden_layer) * learning_rate
+
+    epoch += 1
 
 # Função para mapear a saída prevista para a descrição da cor
 def color_description(output):
